@@ -1,0 +1,40 @@
+name: Generate CBSE Academic Planner Excel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'generate_planner.py'
+      - 'requirements.txt'
+      - '.github/workflows/generate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-excel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate Excel workbook
+        run: python generate_planner.py
+
+      - name: Commit and push generated Excel file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CBSE_Academic_Planner_2026_2027.xlsx
+          git diff --cached --quiet || git commit -m "🏫 Auto-generate CBSE Academic Planner 2026-2027 [skip ci]"
+          git push
